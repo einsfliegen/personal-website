@@ -21,6 +21,11 @@ module.exports.createCampground = async (req, res, next) => {
     }).send();
     const campground = new Campground(req.body.campground);
     campground.geometry = geoData.body.features[0].geometry;
+    const coordinates = req.body.campground.location.split(",");
+    campground.geometry.coordinates[0] = Number(coordinates[0]);
+    campground.geometry.coordinates[1] = Number(coordinates[1]);
+    console.log(req.body.campground.location);
+    console.log(geoData.body.features[0].geometry);
     campground.images = req.files.map(f => ({url: f.path, filename: f.filename }));
     campground.author = req.user._id;
     await campground.save();
