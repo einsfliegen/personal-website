@@ -81,7 +81,7 @@ const sessionConfig = {
 app.use(session(sessionConfig))
 app.use(flash());
 //app.use(helmet({contentSecurityPolicy: false}));
-app.use(helmet());
+//app.use(helmet());
 
 const scriptSrcUrls = [
     "https://stackpath.bootstrapcdn.com/",
@@ -107,27 +107,27 @@ const connectSrcUrls = [
     "https://events.mapbox.com/",
 ];
 const fontSrcUrls = [];
-app.use(
-    helmet.contentSecurityPolicy({
-            directives: {
-                defaultSrc: [],
-                connectSrc: ["'self'", ...connectSrcUrls],
-                scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
-                styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-                workerSrc: ["'self'", "blob:"],
-                objectSrc: [],
-                imgSrc: [
-                    "'self'",
-                    "blob:",
-                    "data:",
-                    "https://res.cloudinary.com/dgux66ig0/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
-                    "https://images.unsplash.com/",
-                    "https://lh3.googleusercontent.com/pw/",
-                ],
-                fontSrc: ["'self'", ...fontSrcUrls],
-            },
-    })
-);
+// app.use(
+//     helmet.contentSecurityPolicy({
+//             directives: {
+//                 defaultSrc: [],
+//                 connectSrc: ["'self'", ...connectSrcUrls],
+//                 scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+//                 styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+//                 workerSrc: ["'self'", "blob:"],
+//                 objectSrc: [],
+//                 imgSrc: [
+//                     "'self'",
+//                     "blob:",
+//                     "data:",
+//                     "https://res.cloudinary.com/dgux66ig0/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+//                     "https://images.unsplash.com/",
+//                     "https://lh3.googleusercontent.com/pw/",
+//                 ],
+//                 fontSrc: ["'self'", ...fontSrcUrls],
+//             },
+//     })
+// );
 
 app.use(passport.initialize());
 app.use(passport.session());
