@@ -1,7 +1,7 @@
-// if (process.env.NODE_ENV !== "production") {
-//     require('dotenv').config();
-// }
-require('dotenv').config();
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+//require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
@@ -21,7 +21,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 
 
 const userRoutes = require('./routes/users');
-const campgroundRoutes = require('./routes/campgrounds');
+const siteRoutes = require('./routes/sites');
 const reviewRoutes = require('./routes/reviews');
 
 mongoose.set('strictQuery', false);
@@ -31,7 +31,8 @@ mongoose.set('strictQuery', false);
 const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp';
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    dbName: 'einsfliegen'
 })
 
 const db = mongoose.connection;
@@ -55,6 +56,7 @@ const secret = process.env.SECRET || 'thisshouldbeabettersecret'
 
 const store = MongoStore.create({
     mongoUrl: dbUrl,
+    dbName: 'einsfliegen',
     crypto: {
         secret
     },
@@ -144,8 +146,8 @@ app.use((req, res, next) => {
 })
 
 app.use('/', userRoutes);
-app.use('/campgrounds', campgroundRoutes);
-app.use('/campgrounds/:id/reviews', reviewRoutes);
+app.use('/sites', siteRoutes);
+app.use('/sites/:id/reviews', reviewRoutes);
 
 app.get('/', (req, res) => {
     res.render('home')
