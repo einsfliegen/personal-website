@@ -11,7 +11,7 @@ ImageSchema.virtual('thumbnail').get(function() {
     return this.url.replace('/upload', '/upload/w_200');
 })
 
-const opts = { toJSON: { virtuals: true}};
+const opts = { toJSON: { virtuals: true}, timestamps: true};
 
 const SiteSchema = new Schema({
     title: String,
@@ -41,12 +41,12 @@ const SiteSchema = new Schema({
         }
     ]
 },
-{ timestamps: true}, opts);
+opts);
 
 SiteSchema.virtual('properties.popUpMarkup').get(function() {
     return `
     <strong><a href="/sites/${this._id}" target="_blank">${this.title}</a></strong>
-    <p>${this.description.substring(0, 20)}...</p>`;
+    <p>${this.attractions}</p>`;
 })
 
 SiteSchema.post('findOneAndDelete', async function(doc){

@@ -20,10 +20,26 @@ module.exports.createSite = async (req, res, next) => {
         limit: 1
     }).send();
     const site = new Site(req.body.site);
-    site.geometry = geoData.body.features[0].geometry;
-    const coordinates = req.body.site.location.split(",");
-    site.geometry.coordinates[0] = Number(coordinates[0]);
-    site.geometry.coordinates[1] = Number(coordinates[1]);
+    //console.log(geoData.body.features[0].geometry);
+    //const hasAlphabet = /^[\x7f-\xffaa-zA-Z0-9.,/"'()+-\s]+$/.test(req.body.site.location);
+    if (geoData.body.features.length > 0) {
+        site.geometry = geoData.body.features[0].geometry;
+    }
+    else {
+        //Initialize an empty geometry object
+        //If user key in invalid location, default place is 0,0
+        const geom = {
+            'type': 'Point',
+            'coordinates' : [0, 0]
+        };
+        site.geometry = geom;
+    }
+    const isCoordinates = /^[-0-9,\s]+$/.test(req.body.site.location);
+    if (isCoordinates) {
+        const coordinates = req.body.site.location.split(",");
+        site.geometry.coordinates[0] = Number(coordinates[0]);
+        site.geometry.coordinates[1] = Number(coordinates[1]);
+    }
     site.images = req.files.map(f => ({url: f.path, filename: f.filename }));
     site.author = req.user._id;
     await site.save();
