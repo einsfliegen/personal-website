@@ -16,6 +16,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
 const helmet = require('helmet');
+const cors = require('cors');
 
 const mongoSanitize = require('express-mongo-sanitize');
 
@@ -84,6 +85,7 @@ app.use(session(sessionConfig))
 app.use(flash());
 //app.use(helmet({contentSecurityPolicy: false}));
 app.use(helmet());
+app.use(cors({ origin: true, credentials: true}));
 
 const scriptSrcUrls = [
     "https://stackpath.bootstrapcdn.com/",
@@ -151,6 +153,10 @@ app.use('/sites/:id/reviews', reviewRoutes);
 
 app.get('/', (req, res) => {
     res.render('home')
+})
+
+app.get('/api', (req, res) => {
+    res.json({ message: "hello from server!!"})
 })
 
 app.all('*', (req, res, next) => {
