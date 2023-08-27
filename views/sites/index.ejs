@@ -1,13 +1,13 @@
 <% layout('layouts/boilerplate') %>
 <link rel="stylesheet" href="/stylesheets/index.css">
-    <div id="cluster-map" class="mb-3"></div>
+    <div id="cluster-map" class="mb-3 rounded"></div>
 
     <% for (let site of sites) { %>
         <div class="card mb-3">
             <div class="row">
                 <div class="col-md-4">
                     <% if(site.images.length) { %>
-                    <img crossorigin="anonymous" class="img-fluid" alt="" src="<%= site.images[0].url %>">
+                    <img crossorigin="anonymous" class="img-fluid rounded" alt="" src="<%= site.images[0].thumbnail %>">
                     <% }else { %>
                         <img crossorigin="anonymous" src="https://res.cloudinary.com/dgux66ig0/image/upload/v1691601571/YelpCamp/x6msiy1ic50zjnjng79q.jpg" alt="" class="img-fluid">
                     <% } %>

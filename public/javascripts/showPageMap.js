@@ -8,6 +8,14 @@ const map = new mapboxgl.Map({
 
 map.addControl(new mapboxgl.NavigationControl());
 
+map.addControl(new mapboxgl.GeolocateControl({
+  positionOptions: {
+      enableHighAccuracy : true
+  },
+  showUserHeading : true,
+  showAccuracyCircle : false
+}))
+
 new mapboxgl.Marker()
   .setLngLat(site.geometry.coordinates)
   .setPopup(

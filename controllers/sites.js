@@ -89,7 +89,13 @@ module.exports.updateSite = async (req, res) => {
 
 module.exports.deleteSite = async (req, res) => {
     const { id } = req.params;
-    await Site.findByIdAndDelete(id);
+    const site = await Site.findById(id);
+    for (let image of site.images) {
+        await cloudinary.uploader.destroy(image.filename);
+    }
+    for (let review of site.reviews) {
+        await Review.findByIdAndDelete(review._id)
+    }
     req.flash('success', 'Successfully deleted site')
     res.redirect('/sites');
 }
