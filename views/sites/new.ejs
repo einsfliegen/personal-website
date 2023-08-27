@@ -12,7 +12,9 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="location">Location</label>
-                    <input class="form-control" type="text" name="site[location]" id="location" required>
+                    <input class="form-control" type="text" name="site[location]" id="location" required><br />
+                    <button class="btn btn-primary" type="button" id="find-me">Get my location</button><br />
+                    <progress id="status-bar" style="display: none;"></progress>
                     <div class="valid-feedback">
                         Looks good!
                       </div>
@@ -53,3 +55,5 @@
             <a href="/sites">All Sites</a>
         </div>
     </div>
+
+    <script src="/javascripts/geoLocation.js"></script>
