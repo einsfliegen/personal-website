@@ -7,6 +7,15 @@ const UserSchema = new Schema({
         type: String,
         required: true,
         unique: true
+    },
+    role : {
+        type: String,
+        enum: ['Admin', 'Creator', 'Viewer'],
+        default : 'Viewer'
+    },
+    active : {
+        type: Boolean,
+        default: false
     }
 });
 

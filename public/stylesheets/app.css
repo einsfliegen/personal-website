@@ -8,6 +8,14 @@
     height: 300px;
 }
 
+#logo {
+    transition: transform .2s ease-in-out;
+}
+
+#logo:hover {
+    transform: rotate(-20deg) scale(1.2);
+}
+
 body {
     background: rgb(228,239,231);
     background: radial-gradient(circle, rgba(228,239,231,1) 0%, rgba(199,233,176,1) 100%);

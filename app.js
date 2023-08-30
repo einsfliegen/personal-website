@@ -9,17 +9,18 @@ const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const flash = require ('connect-flash');
+const flash = require('connect-flash');
 const ExpressError = require('./utils/ExpressError');
 const methodOverride = require('method-override');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
+const Hash = require('./models/hash');
 const helmet = require('helmet');
 const cors = require('cors');
+const catchAsync = require('./utils/catchAsync');
 
 const mongoSanitize = require('express-mongo-sanitize');
-
 
 const userRoutes = require('./routes/users');
 const siteRoutes = require('./routes/sites');
@@ -64,7 +65,7 @@ const store = MongoStore.create({
     touchAfter: 24 * 60 * 60
 })
 
-store.on("error", function(e) {
+store.on("error", function (e) {
     console.log("SESSION STORE ERROR", e)
 })
 
@@ -85,7 +86,7 @@ app.use(session(sessionConfig))
 app.use(flash());
 //app.use(helmet({contentSecurityPolicy: false}));
 app.use(helmet());
-app.use(cors({ origin: true, credentials: true}));
+app.use(cors({ origin: true, credentials: true }));
 
 const scriptSrcUrls = [
     "https://stackpath.bootstrapcdn.com/",
@@ -94,6 +95,8 @@ const scriptSrcUrls = [
     "https://kit.fontawesome.com/",
     "https://cdnjs.cloudflare.com/",
     "https://cdn.jsdelivr.net",
+    "http://ajax.googleapis.com/",
+    "https://code.jquery.com/",
 ];
 const styleSrcUrls = [
     "https://kit-free.fontawesome.com/",
@@ -113,23 +116,23 @@ const connectSrcUrls = [
 const fontSrcUrls = [];
 app.use(
     helmet.contentSecurityPolicy({
-            directives: {
-                defaultSrc: [],
-                connectSrc: ["'self'", ...connectSrcUrls],
-                scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
-                styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-                workerSrc: ["'self'", "blob:"],
-                objectSrc: [],
-                imgSrc: [
-                    "'self'",
-                    "blob:",
-                    "data:",
-                    "https://res.cloudinary.com/dgux66ig0/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
-                    "https://images.unsplash.com/",
-                    "https://lh3.googleusercontent.com/pw/",
-                ],
-                fontSrc: ["'self'", ...fontSrcUrls],
-            },
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            workerSrc: ["'self'", "blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://res.cloudinary.com/dgux66ig0/", //SHOULD MATCH YOUR CLOUDINARY ACCOUNT! 
+                "https://images.unsplash.com/",
+                "https://lh3.googleusercontent.com/pw/",
+            ],
+            fontSrc: ["'self'", ...fontSrcUrls],
+        },
     })
 );
 
@@ -144,6 +147,7 @@ app.use((req, res, next) => {
     res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
+    res.locals.warning = req.flash('warning');
     next();
 })
 
@@ -156,8 +160,25 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api', (req, res) => {
-    res.json({ message: "hello from server!!"})
+    res.json({ message: "hello from server!!" })
 })
+
+app.get('/verify', catchAsync(async (req, res) => {
+    const { id } = req.query;
+    console.log(id);
+    
+    const hash = await Hash.findOne({hash : id}).exec();
+    console.log(hash)
+    if (!hash) {
+        req.flash('warning', 'You already activated your account. The link is not valid anymore.');
+        res.redirect('/login');
+    }
+    const user = await User.findById(hash.user._id);
+    await User.findByIdAndUpdate(user._id, {$set: { active : true}});
+    await Hash.findByIdAndDelete(hash._id);
+    req.flash('success', 'You have successfully activated your account!');
+    res.redirect('/login');
+}))
 
 app.all('*', (req, res, next) => {
     next(new ExpressError('Page Not Found', 404))
