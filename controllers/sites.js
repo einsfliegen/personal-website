@@ -10,6 +10,21 @@ module.exports.index = async (req, res) => {
     res.render('sites/index', { sites })
 }
 
+module.exports.indexV2 = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const perPage = 5;
+    const totalSites = await Site.countDocuments({});
+    const totalPages = Math.ceil(totalSites / perPage);
+
+    const sites = await Site.find({})
+    .skip((page - 1) * perPage)
+    .limit(perPage);
+
+    //const sites = await Site.find({});
+    req.session.returnTo = req.originalUrl;
+    res.render('sites/indexV2', { sites, totalPages, currentPage: page } );
+}
+
 module.exports.renderNewForm = (req, res) => {
     res.render('sites/new');
 }

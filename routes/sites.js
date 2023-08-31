@@ -5,12 +5,13 @@ const catchAsync = require('../utils/catchAsync');
 const { isLoggedIn, isAuthor, validateSite } = require('../middleware');
 const multer = require('multer');
 const { storage } = require('../cloudinary');
-const upload = multer( { storage });
-
 const Site = require('../models/site');
 
+const upload = multer( { storage });
+
 router.route('/')
-    .get(catchAsync(sites.index))
+    //.get(catchAsync(sites.index))
+    .get(catchAsync(sites.indexV2))
     .post(isLoggedIn, upload.array('image'), validateSite, catchAsync(sites.createSite));
 
 router.get('/new', isLoggedIn, sites.renderNewForm);

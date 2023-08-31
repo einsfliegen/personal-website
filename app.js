@@ -52,6 +52,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('admin/dist'));
 app.use(mongoSanitize())
 
 const secret = process.env.SECRET || 'thisshouldbeabettersecret'
@@ -97,6 +98,7 @@ const scriptSrcUrls = [
     "https://cdn.jsdelivr.net",
     "http://ajax.googleapis.com/",
     "https://code.jquery.com/",
+    "https://unpkg.com/",
 ];
 const styleSrcUrls = [
     "https://kit-free.fontawesome.com/",
@@ -162,6 +164,10 @@ app.get('/', (req, res) => {
 app.get('/api', (req, res) => {
     res.json({ message: "hello from server!!" })
 })
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'admin', 'dist', 'admin.html'));
+});
 
 app.get('/verify', catchAsync(async (req, res) => {
     const { id } = req.query;
