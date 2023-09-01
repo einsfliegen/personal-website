@@ -11,6 +11,11 @@ ImageSchema.virtual('thumbnail').get(function() {
     return this.url.replace('/upload', '/upload/c_fill,h_500,w_500');
 })
 
+ImageSchema.virtual('carousel').get(function() {
+    //To-Do: Check size and apply quality reduction if image size >1MB
+    return this.url.replace('/upload', '/upload/q_50');
+})
+
 const opts = { toJSON: { virtuals: true}, timestamps: true};
 
 const SiteSchema = new Schema({
