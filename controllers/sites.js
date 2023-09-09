@@ -20,9 +20,11 @@ module.exports.indexV2 = async (req, res) => {
     .skip((page - 1) * perPage)
     .limit(perPage);
 
+    const allSites = await Site.find({});
+    
     //const sites = await Site.find({});
     req.session.returnTo = req.originalUrl;
-    res.render('sites/indexV2', { sites, totalPages, currentPage: page } );
+    res.render('sites/indexV2', { sites, totalPages, currentPage: page, allSites } );
 }
 
 module.exports.renderNewForm = (req, res) => {

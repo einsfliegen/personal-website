@@ -1,7 +1,8 @@
-$('.container').infiniteScroll({
+$('.my-container').infiniteScroll({
     // options
     path: '.pagination__next',
-    append: '.card',
+    append: '.my-card',
+    status: '.scroller-status',
     hideNav: '.pagination',
   });
 

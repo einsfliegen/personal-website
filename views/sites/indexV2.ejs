@@ -2,8 +2,9 @@
 <link rel="stylesheet" href="/stylesheets/index.css">
     <div id="cluster-map" class="mb-3 rounded"></div>
 
+    <div class="my-container">
     <% for (let site of sites) { %>
-        <div class="card mb-3">
+        <div class="card mb-3 my-card">
             <div class="row">
                 <div class="col-md-4">
                     <% if(site.images.length) { %>
@@ -32,15 +33,22 @@
             </div>
         </div>
         <% } %>
+    </div>
+
+        <div class="scroller-status">
+            <div class="infinite-scroll-request loader-ellips">
+                ...
+              </div>
+            <p class="infinite-scroll-last"><strong>No more items to be loaded</strong></p>
+        </div>
 
         <nav aria-label="Page navigation">
             <ul class="pagination">
-                <% if (currentPage >= totalPages) { %>
-                    <!-- <li class="page-item"><a href="?page=<%= currentPage - 1 %>" class="page-link">Previous</a></li> -->
-                    <p><strong>No more items to be loaded</strong></p>
-                    <% } %>
                 <% for (let i = currentPage + 1; i <= totalPages; i++) { %>
                     <li class="page-item <% if (currentPage === i) { %>active<% } %>"><a href="?page=<%= i %>" class="pagination__next page-link"><%= i %></a></li>
+                    <% } %>
+                <% if (currentPage >= totalPages) { %>
+                    <p><strong>No more sites to be loaded</strong></p>
                     <% } %>
                 <% if (false) { %>
                     <li class="page-item"><a href="?page=<%= currentPage + 1 %>" class="page-link">Next</a></li>
@@ -50,9 +58,9 @@
 
         <script>
             const mapToken = '<%-process.env.MAPBOX_TOKEN%>'
-            const sites = {"features": <%- JSON.stringify(sites) %>}
+            const sites = {"features": <%- JSON.stringify(allSites) %>}
         </script>
-
+        
         <script src="https://unpkg.com/infinite-scroll@4/dist/infinite-scroll.pkgd.min.js"></script>
         <script src="/javascripts/infiniteScroll.js"></script>
         <script src="/javascripts/clusterMap.js"></script>
