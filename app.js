@@ -4,6 +4,8 @@ if (process.env.NODE_ENV !== "production") {
 //require('dotenv').config();
 
 const express = require('express');
+const https = require('https');
+const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
@@ -198,6 +200,13 @@ app.use((err, req, res, next) => {
 })
 
 const port = process.env.PORT || 3100;
-app.listen(port, () => {
+
+https.createServer(
+    {
+        key: fs.readFileSync("private.pem"),
+        cert: fs.readFileSync("certificate.pem"),
+    }, app
+    )
+    .listen(port, () => {
     console.log(`Serving on port ${port}`)
 })
