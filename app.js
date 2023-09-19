@@ -201,12 +201,21 @@ app.use((err, req, res, next) => {
 
 const port = process.env.PORT || 3100;
 
-https.createServer(
-    {
-        key: fs.readFileSync("private.pem"),
-        cert: fs.readFileSync("certificate.pem"),
-    }, app
-    )
-    .listen(port, () => {
-    console.log(`Serving on port ${port}`)
-})
+if (process.env.NODE_ENV !== "production") {
+    app.listen(port, () => {
+        console.log(`Serving on port ${port}`)
+    })
+}
+else{
+    https.createServer(
+        {
+            key: fs.readFileSync("private.pem"),
+            cert: fs.readFileSync("certificate.pem"),
+        }, app
+        )
+        .listen(port, () => {
+        console.log(`Serving on port ${port}`)
+    })
+}
+
+

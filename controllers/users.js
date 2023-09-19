@@ -1,6 +1,5 @@
 const User = require('../models/user');
-const transporter = require('../public/javascripts/sendMail.js');
-const Hash = require('../models/hash.js');
+const { sendConfirmEmail } = require('../utils/sendEmail.js');
 
 module.exports.renderRegister = (req, res) => {
     res.render('users/register');
@@ -9,7 +8,7 @@ module.exports.renderRegister = (req, res) => {
 module.exports.register = async (req, res, next) => {
     try {
         const { email, username, password } = req.body;
-        const queryUsername = await User.findOne({ username: username }).exec();
+        const queryUsername = await User.findOne({ username: username });
         const isUserNameExist = queryUsername ? true : false;
         if (isUserNameExist) {
             throw { name: "UsernameExistError", message: "User name existed!" };
@@ -59,34 +58,5 @@ module.exports.logout = (req, res) => {
         });
     } catch (e) {
         res.redirect('/sites');
-    }
-}
-
-async function sendConfirmEmail(req, user) {
-    try {
-        const { email, username } = req.body;
-        const encodedToken = Buffer.from(username).toString('base64url');
-        //const rand = Math.floor((Math.rand() * 100) + 54);
-        const link = process.env.NODE_ENV !== "production" ? "http://" + req.get('host') + "/verify?id=" + encodedToken : "https://" + req.get('host') + "/verify?id=" + encodedToken;
-        const hash = new Hash({ 'hash': encodedToken });
-        hash.user = user._id;
-        await hash.save();
-        const info = await transporter.sendMail({
-            from: '"Team Einsfliegen" <limyifei0115@einsfliegen.com>',
-            to: email,
-            subject: "Activate your Einsfliegen account",
-            html: `<h1>Hello</h1> ${username} 
-            <br /> 
-            <br> Please click on the link to verify your email:</br> 
-            <br /> 
-            <a href="${link}">Click here to verify</a> 
-            <br />
-            <br>Thanks,</br>
-            <p>Einsfliegen</p>`
-        })
-        console.log(info);
-
-    } catch (e) {
-        console.log(e);
     }
 }

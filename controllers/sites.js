@@ -19,7 +19,6 @@ module.exports.indexV2 = async (req, res) => {
     const sites = await Site.find({})
     .skip((page - 1) * perPage)
     .limit(perPage);
-
     const allSites = await Site.find({});
     
     //const sites = await Site.find({});

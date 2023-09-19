@@ -12,7 +12,7 @@ router.route('/register')
 
 router.route('/login')
     .get(users.renderLogin)
-    .post(storeReturnTo, checkActive, passport.authenticate('local', {failureFlash: true, failureRedirect: '/login'}), users.login);
+    .post(storeReturnTo, passport.authenticate('local', {failureFlash: true, failureRedirect: '/login'}), checkActive, users.login);
 
 router.get('/logout', users.logout);
 
