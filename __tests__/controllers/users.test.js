@@ -20,7 +20,6 @@ const res = {
 
 it('should throw an error when user exists', async () => {
     User.findOne.mockImplementationOnce(() => ({
-        id: 1,
         username: 'einsfliegen',
         email: 'email',
         password: 'password',
@@ -34,21 +33,19 @@ it('should throw an error when user exists', async () => {
 
 it('should register successful and redirect to site', async () => {
     User.findOne.mockImplementationOnce(() => undefined);
+    User.mockReturnValueOnce({
+        username: 'einsfliegen',
+        email: 'fake_email', //Constructor returns email value will be shown in flash
+    })
     User.register.mockReturnValueOnce({
         username: 'einsfliegen',
         email: 'fake_email',
     })
-    User.mockReturnValueOnce({
-        username: 'einsfliegen',
-        email: 'fake_email',
-    })
-
     sendConfirmEmail.mockImplementationOnce(() => undefined);
 
-    const user = {email: req.body.email};
-
     await register(req, res);
-
+    
+    const user = {email: req.body.email};
     expect(req.flash).toHaveBeenCalledWith('success', `Successfully registered! Please verify your email using the link sent to ${user.email}.`);
     expect(res.redirect).toHaveBeenCalledWith('/sites');
 })

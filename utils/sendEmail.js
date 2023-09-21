@@ -1,7 +1,8 @@
 const nodemailer = require("nodemailer");
 const Hash = require('../models/hash.js');
 
-const transporter = nodemailer.createTransport({
+function getTransporter() {
+  return nodemailer.createTransport({
     host: "smtp.strato.de",
     port: 465,
     secure: true,
@@ -11,21 +12,22 @@ const transporter = nodemailer.createTransport({
       pass: process.env.MAIL_PASSWORD,
     },
   });
-  
-  async function sendConfirmEmail(req, user) {
-    try {
-        const { email, username } = req.body;
-        const encodedToken = Buffer.from(username).toString('base64url');
-        //const rand = Math.floor((Math.rand() * 100) + 54);
-        const link = process.env.NODE_ENV !== "production" ? "http://" + req.get('host') + "/verify?id=" + encodedToken : "https://" + req.get('host') + "/verify?id=" + encodedToken;
-        const hash = new Hash({ 'hash': encodedToken });
-        hash.user = user._id;
-        await hash.save();
-        const info = await transporter.sendMail({
-            from: '"Team Einsfliegen" <limyifei0115@einsfliegen.com>',
-            to: email,
-            subject: "Activate your Einsfliegen account",
-            html: `<h1>Hello</h1> ${username} 
+}
+async function sendConfirmEmail(req, user) {
+  try {
+    const { email, username } = req.body;
+    const encodedToken = Buffer.from(username).toString('base64url');
+    //const rand = Math.floor((Math.rand() * 100) + 54);
+    const link = process.env.NODE_ENV !== "production" ? "http://" + req.get('host') + "/verify?id=" + encodedToken : "https://" + req.get('host') + "/verify?id=" + encodedToken;
+    const hash = new Hash({ 'hash': encodedToken });
+    hash.user = user._id;
+    await hash.save();
+    const transporter = getTransporter();
+    const info = await transporter.sendMail({
+      from: '"Team Einsfliegen" <limyifei0115@einsfliegen.com>',
+      to: email,
+      subject: "Activate your Einsfliegen account",
+      html: `<h1>Hello</h1> ${username} 
             <br /> 
             <br> Please click on the link to verify your email:</br> 
             <br /> 
@@ -33,14 +35,13 @@ const transporter = nodemailer.createTransport({
             <br />
             <br>Thanks,</br>
             <p>Einsfliegen</p>`
-        })
-        console.log(info);
-        return info;
+    })
+    console.log(link);
+    return info;
 
-    } catch (e) {
-        console.log(e);
-        return e;
-    }
+  } catch (e) {
+    return e;
+  }
 }
 
 module.exports.sendConfirmEmail = sendConfirmEmail;
