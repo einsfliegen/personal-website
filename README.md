@@ -9,3 +9,4 @@ Notes to myself: Need to grant Jenkins permission for dockers
 sudo usermod -a -G docker jenkins 
 ~~~
 then restart jenkins
+
