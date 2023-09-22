@@ -10,3 +10,4 @@ sudo usermod -a -G docker jenkins
 ~~~
 then restart jenkins
 
+need to mount docker volume with local volume to read files from local volumes
