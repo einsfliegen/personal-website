@@ -209,8 +209,8 @@ if (process.env.NODE_ENV !== "production") {
 else{
     https.createServer(
         {
-            key: fs.readFileSync("private.pem"),
-            cert: fs.readFileSync("certificate.pem"),
+            key: fs.readFileSync("/home/ubuntu/private.pem"),
+            cert: fs.readFileSync("/home/ubuntu/certificate.pem"),
         }, app
         )
         .listen(port, () => {

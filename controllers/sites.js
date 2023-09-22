@@ -1,8 +1,10 @@
 const Site = require('../models/site');
+const Review = require('../models/review');
 const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const { cloudinary } = require('../cloudinary');
+
 const mapBoxToken = process.env.MAPBOX_TOKEN;
 const geocoder = mbxGeocoding({accessToken: mapBoxToken});
-const { cloudinary } = require('../cloudinary');
 
 module.exports.index = async (req, res) => {
     const sites = await Site.find({});
@@ -59,6 +61,7 @@ module.exports.createSite = async (req, res, next) => {
     site.images = req.files.map(f => ({url: f.path, filename: f.filename }));
     site.author = req.user._id;
     await site.save();
+    res.status(201);
     req.flash('success', 'Successfully made a new site');
     res.redirect(`/sites/${site._id}`);
 }
@@ -112,6 +115,7 @@ module.exports.deleteSite = async (req, res) => {
     for (let review of site.reviews) {
         await Review.findByIdAndDelete(review._id)
     }
+    await Site.findByIdAndDelete(site._id);
     req.flash('success', 'Successfully deleted site')
     res.redirect('/sites');
 }
