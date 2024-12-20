@@ -65,8 +65,7 @@ module.exports.checkActive = async (req, res, next) => {
     const { username } = req.body;
     const user = await User.findOne({username : username}).exec();
     if (user.active == false) {
-        req.flash('error', 'Please activate your account first!');
-        return res.redirect('/login');
+        return res.redirect('/logininactive');
     }
     next();
 }

@@ -55,7 +55,7 @@
     </div>
     <div class="col-md-6">
       <div id='map' class="mb-3 rounded"></div>
-      <% if (currentUser) { %>
+      <% if (currentUser && currentUser.active) { %>
       <h2>Leave a Review</h2>
       <form action="/sites/<%= site._id %>/reviews" method="POST" class="mb-3 validated-form" novalidate>
         <!-- <div class="mb-3">

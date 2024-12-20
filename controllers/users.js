@@ -60,3 +60,18 @@ module.exports.logout = (req, res) => {
         res.redirect('/sites');
     }
 }
+
+module.exports.logoutInActive = (req, res) => {
+    try {
+        const username = req.user.username;
+        req.logout(function (err) {
+            if (err) {
+                return next(err);
+            }
+            req.flash('error', 'Please activate your account first!');
+            res.redirect('/login');
+        });
+    } catch (e) {
+        res.redirect('/login');
+    }
+}

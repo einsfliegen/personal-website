@@ -1,7 +1,7 @@
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-//require('dotenv').config();
+// if (process.env.NODE_ENV !== "production") {
+//     require('dotenv').config();
+// }
+require('dotenv').config();
 
 const express = require('express');
 const https = require('https');
@@ -21,9 +21,7 @@ const Hash = require('./models/hash');
 const helmet = require('helmet');
 const cors = require('cors');
 const catchAsync = require('./utils/catchAsync');
-
 const mongoSanitize = require('express-mongo-sanitize');
-
 const userRoutes = require('./routes/users');
 const siteRoutes = require('./routes/sites');
 const reviewRoutes = require('./routes/reviews');
@@ -209,8 +207,8 @@ if (process.env.NODE_ENV !== "production") {
 else{
     https.createServer(
         {
-            key: fs.readFileSync("/home/ubuntu/private.pem"),
-            cert: fs.readFileSync("/home/ubuntu/certificate.pem"),
+            key: fs.readFileSync("private.pem"),
+            cert: fs.readFileSync("certificate.pem"),
         }, app
         )
         .listen(port, () => {

@@ -16,4 +16,6 @@ router.route('/login')
 
 router.get('/logout', users.logout);
 
+router.get('/logininactive', users.logoutInActive);
+
 module.exports = router;
