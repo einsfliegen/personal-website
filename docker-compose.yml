@@ -1,0 +1,25 @@
+name: family-website
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: einsfliegen/family-website:latest
+    ports:
+      - "3100:3100"
+      - "80:80"
+      - "443:443"
+    secrets:
+      - family_website_secret
+    volumes:
+      - ./certs:/etc/ssl/private:ro
+    environment:
+      - SSL_CERT=/etc/ssl/private/certificate.pem
+      - SSL_KEY=/etc/ssl/private/private.pem
+    restart: unless-stopped
+    working_dir: /app
+    command: ["node", "app.js"]
+
+secrets:
+  family_website_secret:
+    file: ./secrets.txt

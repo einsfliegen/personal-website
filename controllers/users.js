@@ -1,12 +1,26 @@
 const User = require('../models/user');
 const { sendConfirmEmail } = require('../utils/sendEmail.js');
+const Recaptcha = require('express-recaptcha').RecaptchaV2;
+const recaptcha = new Recaptcha(process.env.RECAPTCHA_SITE_KEY || '', process.env.RECAPTCHA_SECRET_KEY || '');
 
 module.exports.renderRegister = (req, res) => {
-    res.render('users/register');
+    const captcha = recaptcha.render();
+    res.render('users/register', { captcha });
 }
 
 module.exports.register = async (req, res, next) => {
     try {
+        // verify recaptcha
+        await new Promise((resolve, reject) => {
+            recaptcha.verify(req, (err, data) => {
+                if (err) {
+                    req.flash('error', 'reCAPTCHA verification failed. Please try again.');
+                    return reject(err);
+                }
+                resolve(data);
+            });
+        });
+
         const { email, username, password } = req.body;
         const queryUsername = await User.findOne({ username: username });
         const isUserNameExist = queryUsername ? true : false;
@@ -18,18 +32,13 @@ module.exports.register = async (req, res, next) => {
         await sendConfirmEmail(req, registeredUser);
         req.flash('success', `Successfully registered! Please verify your email using the link sent to ${user.email}.`);
         res.redirect('/sites');
-        // req.login(registeredUser, err => {
-        //     if(err) return next(err);
-        //     req.flash('success', 'Welcome to Food Sites!');
-        //     res.redirect('/sites');
-        // })
     } catch (e) {
-        if (e.code === 11000) {
-            req.flash('error', "The e-mail address you specified is already in use. (Do you already have an account?");
+        if (e && e.code === 11000) {
+            req.flash('error', "The e-mail address you specified is already in use. (Do you already have an account?)");
             res.redirect('/register');
         }
         else {
-            req.flash('error', e.message);
+            if (!req.flash || (e && e.message)) req.flash('error', e.message || 'Registration failed.');
             res.redirect('/register');
         }
     }

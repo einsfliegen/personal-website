@@ -1,5 +1,5 @@
 node_modules
 .env
-certificate.pem
-private.pem
 docker-env.file
+secrets.txt
+certs

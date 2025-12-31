@@ -1,12 +1,40 @@
-// if (process.env.NODE_ENV !== "production") {
-//     require('dotenv').config();
-// }
-require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+
+(function loadDockerSecrets() {
+  const dir = '/run/secrets';
+  if (!fs.existsSync(dir)) return;
+  try {
+    for (const file of fs.readdirSync(dir)) {
+      const p = path.join(dir, file);
+      const content = fs.readFileSync(p, 'utf8').trim();
+      if (!content) continue;
+      // If file looks like dotenv (contains newline or '='), parse lines
+      if (content.includes('\n') || content.includes('=')) {
+        content.split(/\r?\n/).forEach(line => {
+          const l = line.trim();
+          if (!l || l.startsWith('#')) return;
+          const idx = l.indexOf('=');
+          if (idx === -1) return;
+          const key = l.slice(0, idx).trim();
+          const val = l.slice(idx + 1).trim();
+          if (key && process.env[key] === undefined) process.env[key] = val;
+        });
+      } else {
+        // Single value secret: set env var named after file
+        if (process.env[file] === undefined) process.env[file] = content;
+      }
+    }
+  } catch (err) { /* ignore and continue */ }
+})();
+
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+//require('dotenv').config();
 
 const express = require('express');
 const https = require('https');
-const fs = require('fs');
-const path = require('path');
 const mongoose = require('mongoose');
 const ejsMate = require('ejs-mate');
 const session = require('express-session');
@@ -25,6 +53,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const userRoutes = require('./routes/users');
 const siteRoutes = require('./routes/sites');
 const reviewRoutes = require('./routes/reviews');
+
 
 mongoose.set('strictQuery', false);
 
@@ -100,6 +129,8 @@ const scriptSrcUrls = [
     "http://ajax.googleapis.com/",
     "https://code.jquery.com/",
     "https://unpkg.com/",
+    "https://www.google.com/",
+    "https://www.gstatic.com/",
 ];
 const styleSrcUrls = [
     "https://kit-free.fontawesome.com/",
@@ -126,6 +157,7 @@ app.use(
             styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
             workerSrc: ["'self'", "blob:"],
             objectSrc: [],
+            frameSrc: ["https://www.google.com/"],
             imgSrc: [
                 "'self'",
                 "blob:",
@@ -207,8 +239,8 @@ if (process.env.NODE_ENV !== "production") {
 else{
     https.createServer(
         {
-            key: fs.readFileSync("private.pem"),
-            cert: fs.readFileSync("certificate.pem"),
+            key: fs.readFileSync(process.env.SSL_KEY || "private.pem"),
+            cert: fs.readFileSync(process.env.SSL_CERT || "certificate.pem"),
         }, app
         )
         .listen(port, () => {

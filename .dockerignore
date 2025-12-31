@@ -1,0 +1,10 @@
+node_modules
+certs
+.env
+__tests__
+jest.config.js
+*.md
+Dockerfile
+docker-compose.yml
+seeds
+secrets.txt
