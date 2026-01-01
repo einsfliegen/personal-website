@@ -239,8 +239,8 @@ if (process.env.NODE_ENV !== "production") {
 else{
     https.createServer(
         {
-            key: fs.readFileSync(process.env.SSL_KEY || "private.pem"),
-            cert: fs.readFileSync(process.env.SSL_CERT || "certificate.pem"),
+            key: fs.readFileSync(process.env.SSL_KEY || "privkey.pem"),
+            cert: fs.readFileSync(process.env.SSL_CERT || "fullchain.pem"),
         }, app
         )
         .listen(port, () => {

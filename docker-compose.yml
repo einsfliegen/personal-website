@@ -12,10 +12,10 @@ services:
     secrets:
       - family_website_secret
     volumes:
-      - ./certs:/etc/ssl/private:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     environment:
-      - SSL_CERT=/etc/ssl/private/certificate.pem
-      - SSL_KEY=/etc/ssl/private/private.pem
+      - SSL_CERT=/etc/letsencrypt/live/einsfliegen.com/fullchain.pem
+      - SSL_KEY=/etc/letsencrypt/live/einsfliegen.com/privkey.pem
     restart: unless-stopped
     working_dir: /app
     command: ["node", "app.js"]
@@ -23,3 +23,9 @@ services:
 secrets:
   family_website_secret:
     file: ./secrets.txt
+
+# /etc/letsencrypt/live/einsfliegen.com/fullchain.pem
+# /etc/letsencrypt/live/einsfliegen.com/privkey.pem
+
+# To deploy the stack, use the command:
+# docker stack deploy -c docker-compose.yml family-website
