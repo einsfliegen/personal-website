@@ -16,6 +16,7 @@ services:
     environment:
       - SSL_CERT=/etc/letsencrypt/live/einsfliegen.com/fullchain.pem
       - SSL_KEY=/etc/letsencrypt/live/einsfliegen.com/privkey.pem
+      - NODE_ENV=production
     restart: unless-stopped
     working_dir: /app
     command: ["node", "app.js"]

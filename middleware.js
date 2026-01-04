@@ -69,3 +69,24 @@ module.exports.checkActive = async (req, res, next) => {
     }
     next();
 }
+
+module.exports.isAdmin = (req, res, next) => {
+    // If not authenticated, redirect for HTML requests, JSON for API
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+        if (req.originalUrl && req.originalUrl.startsWith('/admin/api')) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+        //req.session.returnTo = req.originalUrl;
+        req.flash('error', 'You must be signed in first!');
+        return res.redirect('/login');
+    }
+    // Only allow users with role 'Admin'
+    if (!req.user || req.user.role !== 'Admin') {
+        if (req.originalUrl && req.originalUrl.startsWith('/admin/api')) {
+            return res.status(403).json({ error: 'Forbidden' });
+        }
+        req.flash('error', 'You do not have permission to access that page!');
+        return res.redirect('/sites');
+    }
+    next();
+}

@@ -40,3 +40,43 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Admin styles */
+.admin-root {
+  max-width: 900px;
+  margin: 1rem auto;
+  padding: 1rem;
+}
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.user-box {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.user-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.user-name { font-weight: 600; font-size: 1.05rem }
+.user-email { color: #666; font-size: 0.9rem }
+.user-meta { text-align: right; color: #333 }
+.user-actions { margin-top: 8px; text-align: right }
+.edit-btn { background: #007bff; color: white; border: none; padding: 6px 10px; border-radius: 4px }
+.edit-panel { margin-top: 10px; display:flex; gap:12px; align-items:center }
+.edit-panel label { display:flex; gap:8px; align-items:center }
+.edit-panel select { padding:4px }
+.edit-buttons { margin-left: auto; display:flex; gap:8px }
+.save-btn { background: #198754; color: white; border: none; padding:6px 10px; border-radius:4px }
+.cancel-btn { background: #6c757d; color: white; border: none; padding:6px 10px; border-radius:4px }
+.delete-btn { background: #dc3545; color: white; border: none; padding:6px 10px; border-radius:4px }
+.status { margin-top: 8px; color: #444 }
+.status.error { color: #c00 }
+

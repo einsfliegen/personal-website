@@ -1,7 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
-(function loadDockerSecrets() {
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+else {
+    // In production, load environment variables from Docker secrets
+    (function loadDockerSecrets() {
   const dir = '/run/secrets';
   if (!fs.existsSync(dir)) return;
   try {
@@ -27,11 +32,7 @@ const path = require('path');
     }
   } catch (err) { /* ignore and continue */ }
 })();
-
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
 }
-//require('dotenv').config();
 
 const express = require('express');
 const https = require('https');
@@ -53,6 +54,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const userRoutes = require('./routes/users');
 const siteRoutes = require('./routes/sites');
 const reviewRoutes = require('./routes/reviews');
+const { isAdmin } = require('./middleware');
 
 
 mongoose.set('strictQuery', false);
@@ -79,9 +81,10 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static('admin/dist'));
+//app.use(express.static('/admin', express.static('admin/dist')));
 app.use(mongoSanitize())
 
 const secret = process.env.SECRET || 'thisshouldbeabettersecret'
@@ -125,7 +128,7 @@ const scriptSrcUrls = [
     "https://api.mapbox.com/",
     "https://kit.fontawesome.com/",
     "https://cdnjs.cloudflare.com/",
-    "https://cdn.jsdelivr.net",
+    "https://cdn.jsdelivr.net/",
     "http://ajax.googleapis.com/",
     "https://code.jquery.com/",
     "https://unpkg.com/",
@@ -139,13 +142,14 @@ const styleSrcUrls = [
     "https://api.tiles.mapbox.com/",
     "https://fonts.googleapis.com/",
     "https://use.fontawesome.com/",
-    "https://cdn.jsdelivr.net",
+    "https://cdn.jsdelivr.net/",
 ];
 const connectSrcUrls = [
     "https://api.mapbox.com/",
     "https://a.tiles.mapbox.com/",
     "https://b.tiles.mapbox.com/",
     "https://events.mapbox.com/",
+    "https://cdn.jsdelivr.net/",
 ];
 const fontSrcUrls = [];
 app.use(
@@ -190,6 +194,34 @@ app.use('/', userRoutes);
 app.use('/sites', siteRoutes);
 app.use('/sites/:id/reviews', reviewRoutes);
 
+// Admin API to list and update users for the admin React UI
+app.get('/admin/api/users', isAdmin, catchAsync(async (req, res) => {
+    const users = await User.find({}).select('username email role active').lean();
+    res.json(users);
+}));
+
+app.patch('/admin/api/users/:id', isAdmin, catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const { role, active } = req.body;
+    const update = {};
+    if (role !== undefined) update.role = role;
+    if (active !== undefined) update.active = active;
+    const allowedRoles = ['Admin', 'Creator', 'Viewer'];
+    if (update.role && !allowedRoles.includes(update.role)) {
+        return res.status(400).json({ error: 'Invalid role' });
+    }
+    const user = await User.findByIdAndUpdate(id, update, { new: true }).select('username email role active');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
+}));
+
+app.delete('/admin/api/users/:id', isAdmin, catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const user = await User.findByIdAndDelete(id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({ message: 'User deleted' });
+}));
+
 app.get('/', (req, res) => {
     res.render('home')
 })
@@ -198,9 +230,10 @@ app.get('/api', (req, res) => {
     res.json({ message: "hello from server!!" })
 })
 
-app.get('/admin', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'admin', 'dist', 'admin.html'));
-});
+// app.get('/admin', isAdmin, (req, res) => {
+//     res.sendFile(path.resolve(__dirname, 'admin', 'dist', 'index.html'));
+// });
+app.use('/admin', isAdmin, express.static(path.join(__dirname, 'admin', 'dist')));
 
 app.get('/verify', catchAsync(async (req, res) => {
     const { id } = req.query;
