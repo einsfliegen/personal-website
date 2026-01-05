@@ -236,11 +236,8 @@ app.get('/api', (req, res) => {
 app.use('/admin', isAdmin, express.static(path.join(__dirname, 'admin', 'dist')));
 
 app.get('/verify', catchAsync(async (req, res) => {
-    const { id } = req.query;
-    console.log(id);
-    
+    const { id } = req.query;   
     const hash = await Hash.findOne({hash : id}).exec();
-    console.log(hash)
     if (!hash) {
         req.flash('warning', 'You already activated your account. The link is not valid anymore.');
         res.redirect('/login');

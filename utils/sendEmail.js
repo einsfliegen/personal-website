@@ -36,7 +36,6 @@ async function sendConfirmEmail(req, user) {
             <br>Thanks,</br>
             <p>Einsfliegen</p>`
     })
-    console.log(link);
     return info;
 
   } catch (e) {

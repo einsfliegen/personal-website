@@ -3,4 +3,3 @@ node_modules
 docker-env.file
 secrets.txt
 certs
-admin/dist
